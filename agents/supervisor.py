@@ -12,7 +12,7 @@ from .llm_factory import LLMFactory
 
 
 class SystemSupervisor:
-    """Master Distributed Component Coordinator for Secure Enclave Sgx Attestation."""
+    """Coordinator for three deterministic telemetry rules."""
 
     def __init__(self, model_provider: str = "mock"):
         self.qc_worker = InvariantQCWorker()
@@ -68,7 +68,7 @@ class SystemSupervisor:
             total_alerts=len(all_alerts),
             critical_alerts_count=crit_count,
             alerts=all_alerts,
-            consensus_summary=f"Multi-agent consensus completed with status [{overall_urgency.value}]. Total alerts: {len(all_alerts)}.",
+            consensus_summary=f"Three rule checks completed with status [{overall_urgency.value}]. Total alerts: {len(all_alerts)}. No hardware attestation performed.",
             audit_hash=audit_entry["current_hash"],
         )
 
@@ -79,5 +79,5 @@ class SystemSupervisor:
         if len(query) > 8192:
             raise ValueError("Query exceeds 8192 characters")
         PHIGuard.assert_no_phi(query)
-        prompt = f"Supervisor inquiry for Secure Enclave Sgx Attestation under HIPAA Safe Harbor §164.514 / Google SecAgg Standards: {query}"
+        prompt = f"Supervisor inquiry for Secure Enclave Sgx Attestation for rule-based demonstration (not attestation): {query}"
         return self.llm.invoke(prompt)
