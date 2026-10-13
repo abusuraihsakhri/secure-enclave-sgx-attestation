@@ -3,6 +3,7 @@ Supervisor Orchestrator & Operations Intelligence for Secure Enclave Sgx Attesta
 Domain: Privacy-Preserving Federated Healthcare & FHE
 """
 import uuid
+import json
 from typing import Dict, Any, List, Optional
 from .base import AuditLogger, ActionExecutor, PHIGuard
 from .models import SystemTaskPayload, AgentAlert, ConsensusDossier, UrgencyLevel, SystemIntegrityStatus
@@ -25,6 +26,7 @@ class SystemSupervisor:
         PHIGuard.assert_no_phi(payload.task_id)
         PHIGuard.assert_no_phi(payload.target_identifier)
         PHIGuard.assert_no_phi(payload.status_descriptor)
+        PHIGuard.assert_no_phi(json.dumps(payload.attributes, sort_keys=True))
 
         # Multi-worker evaluations
         all_alerts: List[AgentAlert] = []
@@ -74,6 +76,8 @@ class SystemSupervisor:
         return dossier
 
     def query_supervisory_chat(self, query: str) -> str:
+        if len(query) > 8192:
+            raise ValueError("Query exceeds 8192 characters")
         PHIGuard.assert_no_phi(query)
         prompt = f"Supervisor inquiry for Secure Enclave Sgx Attestation under HIPAA Safe Harbor §164.514 / Google SecAgg Standards: {query}"
         return self.llm.invoke(prompt)
