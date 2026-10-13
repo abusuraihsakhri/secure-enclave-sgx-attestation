@@ -10,6 +10,19 @@ from .agents import EnclaveGuardCoordinator
 
 coordinator = EnclaveGuardCoordinator()
 
+def parse_csv_bool(value):
+    """Parse booleans in CSV instead of relying on truthiness of strings."""
+    if isinstance(value, bool):
+        return value
+    normalized = str(value if value is not None else "").strip().lower()
+    if normalized in ("true", "1", "yes", "y"):
+        return True
+    if normalized in ("false", "0", "no", "n", ""):
+        return False
+    raise ValueError(f"Invalid CSV boolean: {value!r}")
+
+
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="secure-enclave-sgx-attestation", description="EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Agent")
@@ -83,7 +96,7 @@ def main(argv=None):
                 primary_metric=float(r.get("primary_metric", 15.0)),
                 secondary_metric=float(r.get("secondary_metric", 5.0)),
                 status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                is_critical_flag=bool(r.get("is_critical_flag", False)),
+                is_critical_flag=parse_csv_bool(r.get("is_critical_flag", False)),
             )
             dossier = coordinator.process(payload)
             row_dict = dict(r)
