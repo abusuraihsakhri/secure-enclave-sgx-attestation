@@ -35,7 +35,7 @@ def create_app():
             secondary_metric: float = Field(default=14.2, allow_inf_nan=False)
             status_descriptor: str = "DISCORDANT_ANOMALY"
             is_critical_flag: bool = True
-            attributes: Dict[str, Any] = {}
+            attributes: Dict[str, Any] = Field(default_factory=dict)
 
         class ChatRequest(BaseModel):
             query: str
