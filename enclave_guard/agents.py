@@ -9,7 +9,7 @@ from .engine import FrontierDomainEngine
 
 
 class QuoteSignatureVerifierAgent:
-    """Specialized Sub-Agent 1: Primary Parameter & Integrity Auditor."""
+    """Legacy numerical threshold checker; no quote signature verification."""
     def audit(self, payload: FrontierPayload) -> List[AgentTelemetryAlert]:
         alerts = []
         res = FrontierDomainEngine.evaluate_primary_parameter(payload.primary_metric)
@@ -43,7 +43,7 @@ class EnclaveMeasurementAuditorAgent:
 
 
 class AttestedTLSHandshakeAgent:
-    """Specialized Sub-Agent 3: Protocol Conformance & Anomaly Triager."""
+    """Legacy descriptor keyword checker; no attested TLS handshake."""
     def audit(self, payload: FrontierPayload) -> List[AgentTelemetryAlert]:
         alerts = []
         res = FrontierDomainEngine.audit_specification_conformance(payload.status_descriptor, payload.attributes)
