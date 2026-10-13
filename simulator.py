@@ -9,7 +9,9 @@ from agents.supervisor import SystemSupervisor
 from agents.base import PHIGuard, SecurityException, AuditLogger
 
 def run_simulation(iterations: int = 100):
-    if iterations < 1:\n        raise ValueError("iterations must be a positive integer")\n    print(f"Starting Distributed Component Simulation on Secure Enclave Sgx Attestation ({iterations} tasks)...")
+    if iterations < 1:
+        raise ValueError("iterations must be a positive integer")
+    print(f"Starting Distributed Component Simulation on Secure Enclave Sgx Attestation ({iterations} tasks)...")
     supervisor = SystemSupervisor(model_provider="mock")
     start_time = time.time()
     nominal_count = 0
