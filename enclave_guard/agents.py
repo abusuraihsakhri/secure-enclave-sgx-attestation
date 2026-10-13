@@ -103,8 +103,8 @@ class EnclaveGuardCoordinator:
     def query_supervisory_chat(self, query: str) -> str:
         q = query.strip().lower()
         if "status" in q or "ledger" in q:
-            return f"EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Agent currently managing {len(self.execution_ledger)} execution tasks in air-gapped memory."
+            return f"EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Agent currently storing {len(self.execution_ledger)} in-memory rule results."
         elif "standard" in q or "spec" in q:
-            return "Active runtime operating strictly according to Intel SGX ECDSA Attestation / AMD SEV-SNP specifications."
+            return "Active runtime operating strictly according to illustrative threshold rules; no quote verification is implemented."
         else:
-            return f"EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Agent executive coordinator online. Zero-telemetry on-premises surveillance active."
+            return f"EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Agent executive coordinator online. Only local in-memory rule evaluation is implemented."
