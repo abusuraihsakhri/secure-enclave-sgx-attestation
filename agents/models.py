@@ -1,7 +1,7 @@
 """
-Pydantic v2 schemas and data definitions for Secure Enclave Sgx Attestation.
+Pydantic v2 schemas for the threshold classification demonstration.
 Domain: Privacy-Preserving Federated Healthcare & FHE
-Standard: HIPAA Safe Harbor §164.514 / Google SecAgg Standards
+Not a hardware attestation or HIPAA de-identification implementation
 """
 import datetime
 import json
@@ -59,7 +59,7 @@ class AgentAlert(BaseModel):
     summary: str
     technical_details: str
     actionable_remediation: str
-    standard_reference: str = "HIPAA Safe Harbor §164.514 / Google SecAgg Standards"
+    standard_reference: str = "Demonstration thresholds (primary > 25, secondary > 12)"
     timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
     def to_dict(self) -> Dict[str, Any]:
@@ -77,7 +77,7 @@ class ConsensusDossier(BaseModel):
     total_alerts: int
     critical_alerts_count: int
     alerts: List[AgentAlert]
-    standard_reference: str = "HIPAA Safe Harbor §164.514 / Google SecAgg Standards"
+    standard_reference: str = "Demonstration thresholds (primary > 25, secondary > 12)"
     consensus_summary: str
     audit_hash: str
     timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
