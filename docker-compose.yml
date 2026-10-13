@@ -1,17 +1,14 @@
-version: '3.8'
-
 services:
   secure-enclave-sgx-attestation:
     build: .
-    container_name: secure-enclave-sgx-attestation
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
-      - AUDIT_SECRET_KEY=secure-enclave-sgx-attestation-prod-audit-key-2026
-      - MODEL_PROVIDER=mock
+      API_TOKEN: "${API_TOKEN:?Set API_TOKEN to a secure random value}"
+      MODEL_PROVIDER: mock
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
       interval: 30s
       timeout: 5s
       retries: 3
