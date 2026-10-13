@@ -58,8 +58,8 @@ def test_csv_false_does_not_trigger_critical_alert(tmp_path):
     source = tmp_path / "input.csv"
     output = tmp_path / "output.csv"
     source.write_text(
-        "task_id,target_identifier,primary_metric,secondary_metric,is_critical_flag,status_descriptor\\n"
-        "T-2,SAMPLE-2,10,4,False,NOMINAL\\n".replace("\\n", "\n"),
+        "task_id,target_identifier,primary_metric,secondary_metric,is_critical_flag,status_descriptor\n"
+        "T-2,SAMPLE-2,10,4,False,NOMINAL\n",
         encoding="utf-8",
     )
     assert main(["batch", "-i", str(source), "-o", str(output)]) == 0
