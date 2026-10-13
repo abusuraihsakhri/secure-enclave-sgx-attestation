@@ -1,99 +1,83 @@
 # Secure Enclave SGX Attestation
 
-> **Domain:** Privacy-Preserving Healthcare & Federated Computing  
-> **Reference Guidelines & Standards:** `HIPAA Safe Harbor §164.514 & Differential Privacy RDP`
+A Python research demonstrator for **rule-based security telemetry classification**, with a separate browser-only interface. Despite the historical repository name, **this code does not perform Intel SGX or AMD SEV-SNP hardware attestation**. It does not validate quotes, MRENCLAVE/MRSIGNER, collateral, certificate chains, report data, revocation status, freshness, or attested TLS. Do not use classification results as trust evidence.
 
-<div align="center">
+## What works
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+- Three deterministic checks in `agents/workers.py`: primary metric above 25, secondary metric above 12 or an explicit critical flag, and anomaly keywords in a status descriptor.
+- Classification as `ROUTINE`, `ELEVATED_RISK` or `CRITICAL_STAT_PANIC`, with machine-readable dossiers.
+- CLI single evaluation, CSV batch mode, interactive query-mock command, simulation, and a FastAPI interface.
+- Process-local HMAC-SHA256 chained audit entries, verified by recalculating signatures. The chain is **not persistent, externally anchored, or protected by an enclave**.
+- Best-effort sensitive-identifier pattern screening; **not** complete PHI detection, HIPAA de-identification, or compliance certification.
+- Self-contained browser demo in `web/`; no remote API, login, data upload, or WebAssembly runtime.
 
-</div>
+The older `enclave_guard/` entry points remain for compatibility and use **different secondary thresholds**. The browser matches the newer `agents/` implementation only. The `enrichment.py` modules provide generic numerical threshold examples, not formal security or NIST compliance verification.
 
----
+## Use the browser demo
 
-## 📖 What It Does
-
-**Secure Enclave SGX Attestation** is an advanced analytical and computational platform implementing Intel SGX / AMD SEV remote attestation, MRENCLAVE validation & attested TLS.
-
----
-
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-- **Deterministic Calculation Engine**: Strict compliance with standard reference formulations and thresholds.
-- **Risk & Urgency Classification**: Multi-tier categorization with automated clinical/operational action recommendations.
-- **Validation & Guardrails**: Rigorous input bounds checking and anomaly detection.
-
----
-
-## 💻 CLI Quickstart & Usage
-
-### 1. Guided Interactive Mode
-```bash
-python cli.py
-```
-
-### 2. Direct Parameterized Evaluation
-```bash
-python cli.py --task-id <value> --target <value> --primary <value> --secondary <value>
-```
-
-### Parameter Reference
-- `--task-id`: Specifies input measurement or parameter value.
-- `--target`: Specifies input measurement or parameter value.
-- `--primary`: Specifies input measurement or parameter value.
-- `--secondary`: Specifies input measurement or parameter value.
-- `--critical`: Specifies input measurement or parameter value.
-- `--status`: Specifies input measurement or parameter value.
-- `--input`: Specifies input measurement or parameter value.
-- `--output`: Specifies input measurement or parameter value.
-
-### Input Data Schema
-
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `task_id` | Parameter / observation metric | Required |
-| `target_identifier` | Parameter / observation metric | Required |
-| `primary_metric` | Parameter / observation metric | Required |
-| `secondary_metric` | Parameter / observation metric | Required |
-| `is_critical_flag` | Parameter / observation metric | Required |
-| `status_descriptor` | Parameter / observation metric | Required |
-
----
-
-## 🛡️ Security & Enterprise Architecture
-
-* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated test suite:
+The static browser application is in `web/index.html`. Run a local static server, then open `http://localhost:8080/`:
 
 ```bash
-pytest -v
+python -m http.server 8080 --directory web
 ```
 
-Execute high-throughput batch simulation benchmarks:
+Enter non-sensitive demonstration values, select **Evaluate locally**, and optionally export the JSON result. Everything is computed in-browser by `web/rules.mjs`; the export explicitly states that no cryptographic attestation occurred. The repository includes a GitHub Pages deployment workflow for `master`; a public Pages URL should only be advertised after the repository's Pages settings and live deployment are verified.
+
+## Install and use Python
+
+Python 3.9 or newer is required.
 
 ```bash
-python simulator.py --tasks 1000 --concurrency 8
+python -m pip install -e ".[api,test]"
+python cli.py audit --task-id DEMO-01 --target SAMPLE-01 --primary 29.4 --secondary 14.8 --status DISCORDANT --critical
+python cli.py chat Explain specifications
+python cli.py batch --input sample.csv --output results.csv
+python cli.py verify-audit
+python simulator.py 100
 ```
 
----
+CSV columns are `task_id,target_identifier,primary_metric,secondary_metric,is_critical_flag,status_descriptor`. Boolean values accept `true/false`, `yes/no` and `1/0`. Batch results contain classifications and **process-local** HMAC audit hashes. `verify-audit` checks only audit entries created in the current Python process, not earlier CLI executions.
 
-## 🐳 Container Deployment
+The installed command `enclave-threshold-demo` invokes the root CLI. The historical `secure-enclave-sgx-attestation` entry point and `python enclave_guard_app.py` invoke the separate legacy CLI.
+
+## Start the API
+
+All endpoints other than `GET /health` require an `x-api-key` header equal to the `API_TOKEN` environment variable. No default token is supplied; without a configured token, protected routes return HTTP 503.
 
 ```bash
-docker build -t secure-enclave-sgx-attestation .
-docker run -p 8000:8000 secure-enclave-sgx-attestation
+export API_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+python cli.py serve --host 127.0.0.1 --port 8000
+curl -H "x-api-key: $API_TOKEN" \
+  -H "content-type: application/json" \
+  -d '{"task_id":"DEMO","target_identifier":"TEST","primary_metric":10,"secondary_metric":4,"status_descriptor":"NOMINAL","is_critical_flag":false}' \
+  http://127.0.0.1:8000/api/audit
 ```
+
+Other endpoints: `POST /api/chat` (deterministic mock), `GET /metrics` (JSON), `GET /api/audit/logs` (in-memory chain), and `GET /health`. Neither mock chat nor the API performs enclave attestation.
+
+## Docker
+
+```bash
+export API_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+docker compose up --build
+```
+
+Compose publishes the API on `127.0.0.1:8000` only. For anything exposed beyond localhost, use TLS, authentication and network controls; the demo has no rate limiting or durable storage. The optional `AUDIT_SECRET_KEY` environment variable sets a stable HMAC key for the current process; otherwise a random key is generated at startup. **A stable key does not provide cross-process audit persistence** because no trail is saved. Replace any key previously copied from older repository configurations.
+
+## Testing
+
+```bash
+python -m pytest -q
+python -m compileall -q agents enclave_guard cli.py enrichment.py simulator.py
+node --test web/tests/*.test.mjs
+```
+
+GitHub Actions tests Python 3.10–3.12 and the standalone browser rule module. A passing test suite demonstrates correct behavior of these **simulated rules**, not the security of SGX hardware or attestation infrastructure.
+
+## Privacy and limitations
+
+The browser version performs local calculations and retains only session-local state until reload. The Python API stores dossiers and hashed audit metadata in process memory; it is not suitable for protected health information or secrets. Identifier screening is regex-based and incomplete. Neither the browser nor the Python API should be treated as a secure enclave, confidential computing runtime, healthcare compliance control, or remote attestation verifier.
+
+## Technology and license
+
+Python, Pydantic 2, FastAPI, optional Uvicorn, plain HTML/CSS/JavaScript, and GitHub Actions. The browser demo uses modern ES modules supported by current Chrome, Firefox, Safari and Edge. Licensed under [MIT](LICENSE).

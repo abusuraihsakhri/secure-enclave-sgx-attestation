@@ -1,6 +1,7 @@
 """
 Enrichment Feature Implementation for secure-enclave-sgx-attestation.
-Generated based on domain-specific requirements in specifications.
+These eight modules evaluate the same illustrative numerical thresholds.
+They do not perform formal verification, NIST compliance assessment, or SGX attestation.
 """
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, Tuple

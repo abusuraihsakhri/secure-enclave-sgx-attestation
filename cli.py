@@ -11,6 +11,19 @@ from agents.base import AuditLogger
 
 supervisor = SystemSupervisor(model_provider="mock")
 
+def parse_csv_bool(value):
+    """Parse booleans in CSV instead of relying on truthiness of strings."""
+    if isinstance(value, bool):
+        return value
+    normalized = str(value if value is not None else "").strip().lower()
+    if normalized in ("true", "1", "yes", "y"):
+        return True
+    if normalized in ("false", "0", "no", "n", ""):
+        return False
+    raise ValueError(f"Invalid CSV boolean: {value!r}")
+
+
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="secure-enclave-sgx-attestation", description="Secure Enclave Sgx Attestation")
@@ -56,7 +69,7 @@ def main(argv=None):
         dossier = supervisor.process_task(payload)
         print("=" * 80)
         print(f"  SECURE ENCLAVE SGX ATTESTATION")
-        print(f"  Domain: Privacy-Preserving Federated Healthcare & FHE | Standard: HIPAA Safe Harbor §164.514 / Google SecAgg Standards")
+        print(f"  Mode: deterministic telemetry rules | SGX/SEV attestation: NOT PERFORMED")
         print(f"  Dossier ID: {dossier.dossier_id} | Urgency: [{dossier.overall_urgency.value}]")
         print("=" * 80)
         for a in dossier.alerts:
@@ -77,7 +90,7 @@ def main(argv=None):
         trail = AuditLogger.get_trail()
         valid = AuditLogger.verify_integrity()
         print(f"Audit Trail Blocks: {len(trail)} | Cryptographic Integrity Verified: {valid}")
-        return 0
+        return 0 if valid else 1
 
     if args.command == "batch":
         with open(args.input, mode="r", encoding="utf-8-sig") as f:
@@ -94,7 +107,7 @@ def main(argv=None):
                 primary_metric=float(r.get("primary_metric", 15.0)),
                 secondary_metric=float(r.get("secondary_metric", 5.0)),
                 status_descriptor=r.get("status_descriptor", "NOMINAL"),
-                is_critical_flag=bool(r.get("is_critical_flag", False)),
+                is_critical_flag=parse_csv_bool(r.get("is_critical_flag", False)),
             )
             dossier = supervisor.process_task(payload)
             row_dict = dict(r)

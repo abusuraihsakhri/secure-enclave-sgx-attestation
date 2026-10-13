@@ -1,7 +1,7 @@
 """
-Secure Enclave Sgx Attestation — Enterprise Automated Analytical Suite.
+Secure Enclave Sgx Attestation — Rule-based telemetry demonstration.
 Domain: Privacy-Preserving Federated Healthcare & FHE
-Standard: HIPAA Safe Harbor §164.514 / Google SecAgg Standards
+Not an SGX quote verifier or HIPAA certification tool
 
 """
-__version__ = "3.0.0-ENTERPRISE"
+__version__ = "3.0.1"

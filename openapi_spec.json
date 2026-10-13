@@ -1,112 +1,170 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Secure Enclave Sgx Attestation API",
-    "description": "Enterprise Distributed Component Platform (Clinical & Cryptographic AI) adhering to CAP / CLSI / NIST Standards.",
-    "version": "3.0.0-ENTERPRISE",
-    "contact": {
-      "name": "Dr. Abu Suraih Sakhri",
-      "url": "https://github.com/abusuraihsakhri"
+    "title": "Secure Enclave Threshold Demonstrator API",
+    "version": "3.0.1",
+    "description": "A rule-based telemetry classification demonstrator. Does not perform SGX/SEV-SNP quote verification, cryptographic attestation, or HIPAA certification."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "SystemTaskPayload": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "target_identifier",
+          "primary_metric"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "target_identifier": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "primary_metric": {
+            "type": "number"
+          },
+          "secondary_metric": {
+            "type": "number",
+            "default": 0
+          },
+          "status_descriptor": {
+            "type": "string",
+            "default": "NOMINAL"
+          },
+          "is_critical_flag": {
+            "type": "boolean",
+            "default": false
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": true,
+            "default": {}
+          }
+        }
+      }
     }
   },
   "paths": {
     "/health": {
       "get": {
-        "summary": "Health and metadata check",
+        "summary": "Process liveness and demonstration mode",
         "responses": {
           "200": {
-            "description": "System optimal"
+            "description": "JSON process status"
           }
         }
       }
     },
     "/metrics": {
       "get": {
-        "summary": "Prometheus operational metrics",
+        "summary": "Process-local JSON metrics",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Prometheus text metrics"
+            "description": "JSON counters"
+          },
+          "401": {
+            "description": "Invalid API token"
+          },
+          "503": {
+            "description": "API token not configured"
           }
         }
       }
     },
     "/api/audit": {
       "post": {
-        "summary": "Dispatch task payload across specialized workers",
+        "summary": "Run numerical/keyword rule evaluation, not SGX quote verification",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "task_id": {
-                    "type": "string"
-                  },
-                  "target_identifier": {
-                    "type": "string"
-                  },
-                  "primary_metric": {
-                    "type": "number"
-                  },
-                  "secondary_metric": {
-                    "type": "number"
-                  },
-                  "status_descriptor": {
-                    "type": "string"
-                  },
-                  "is_critical_flag": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "task_id",
-                  "target_identifier",
-                  "primary_metric"
-                ]
+                "$ref": "#/components/schemas/SystemTaskPayload"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Consensus dossier with HMAC signature"
+            "description": "Rule classification and in-memory chain hash"
+          },
+          "400": {
+            "description": "Identifier screening rejected input"
+          },
+          "401": {
+            "description": "Invalid API token"
+          },
+          "422": {
+            "description": "Invalid payload"
+          },
+          "503": {
+            "description": "API token not configured"
           }
         }
       }
     },
     "/api/chat": {
       "post": {
-        "summary": "Air-gapped supervisory conversational assistant",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "query"
-                ]
-              }
-            }
+        "summary": "Return deterministic mock response",
+        "security": [
+          {
+            "ApiKey": []
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Supervisory response"
+            "description": "Mock response"
+          },
+          "400": {
+            "description": "Input rejected"
+          },
+          "401": {
+            "description": "Invalid API token"
           }
         }
       }
     },
     "/api/audit/logs": {
       "get": {
-        "summary": "Retrieve and cryptographically verify HMAC audit trail",
+        "summary": "Get process-local HMAC audit chain",
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Cryptographic audit trail"
+            "description": "Audit entries and integrity status"
+          },
+          "401": {
+            "description": "Invalid API token"
           }
         }
       }
