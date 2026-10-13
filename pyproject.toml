@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "secure-enclave-sgx-attestation"
-version = "2.0.0"
-description = "EnclaveGuard: Intel SGX / AMD SEV Remote Attestation & Quoting Engine"
+version = "3.0.1"
+description = "Rule-based enclave security telemetry demonstration (not hardware attestation)"
 readme = "README.md"
 authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
 license = { text = "MIT" }
@@ -13,14 +13,17 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Security/Cryptography",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 requires-python = ">=3.9"
-dependencies = []
+dependencies = ["pydantic>=2.7,<3"]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.110,<1", "uvicorn>=0.27,<1"]
+test = ["pytest>=8,<10", "httpx>=0.27,<1"]
 
 [project.scripts]
 secure-enclave-sgx-attestation = "enclave_guard.cli:main"
+enclave-threshold-demo = "cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/secure-enclave-sgx-attestation"
