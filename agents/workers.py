@@ -1,7 +1,7 @@
 """
 Specialized Domain Worker Agents for Secure Enclave Sgx Attestation.
 Domain: Privacy-Preserving Federated Healthcare & FHE
-Standard: HIPAA Safe Harbor §164.514 / Google SecAgg Standards
+Rule-based sample evaluation; not hardware or regulatory compliance
 """
 import uuid
 from typing import Dict, Any, List, Optional
@@ -9,7 +9,7 @@ from .models import SystemTaskPayload, AgentAlert, UrgencyLevel, SystemIntegrity
 
 
 class InvariantQCWorker:
-    """Worker 1: Primary Mathematical & Protocol Boundary Auditor."""
+    """Worker 1: Primary illustrative numerical threshold check."""
 
     @classmethod
     def evaluate(cls, payload: SystemTaskPayload) -> List[AgentAlert]:
@@ -20,14 +20,14 @@ class InvariantQCWorker:
                 origin_worker="InvariantQCWorker",
                 urgency=UrgencyLevel.ELEVATED,
                 summary="Primary Metric Threshold Exceeded",
-                technical_details=f"Primary measurement ({payload.primary_metric:.2f}) exceeds upper reference limit (25.00) under HIPAA Safe Harbor §164.514 / Google SecAgg Standards.",
+                technical_details=f"Primary measurement ({payload.primary_metric:.2f}) exceeds upper reference limit (25.00) in this demonstration.",
                 actionable_remediation="Initiate recalibration workflow and review secondary parameters.",
             ))
         return alerts
 
 
 class SafetyEscalationWorker:
-    """Worker 2: Safety Boundary, Toxicity & Emergency Interlock Worker."""
+    """Worker 2: Secondary numerical threshold and boolean escalation check."""
 
     @classmethod
     def evaluate(cls, payload: SystemTaskPayload) -> List[AgentAlert]:
@@ -45,7 +45,7 @@ class SafetyEscalationWorker:
 
 
 class ProtocolConformanceWorker:
-    """Worker 3: Spec Conformance, Anomaly Triage & Discordance Checker."""
+    """Worker 3: Keyword triage demonstration."""
 
     @classmethod
     def evaluate(cls, payload: SystemTaskPayload) -> List[AgentAlert]:
@@ -57,7 +57,7 @@ class ProtocolConformanceWorker:
                 origin_worker="ProtocolConformanceWorker",
                 urgency=UrgencyLevel.ELEVATED,
                 summary="Protocol Conformance Discordance Detected",
-                technical_details=f"Descriptor '{payload.status_descriptor}' indicates discordance with HIPAA Safe Harbor §164.514 / Google SecAgg Standards standards.",
-                actionable_remediation="Re-evaluate input specimen or rerun secondary confirmation assay.",
+                technical_details=f"Descriptor '{payload.status_descriptor}' matches a configured anomaly keyword.",
+                actionable_remediation="Review the descriptor and demonstrate a different input.",
             ))
         return alerts
