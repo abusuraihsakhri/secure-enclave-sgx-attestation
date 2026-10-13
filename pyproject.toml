@@ -28,3 +28,7 @@ enclave-threshold-demo = "cli:main"
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/secure-enclave-sgx-attestation"
 Repository = "https://github.com/abusuraihsakhri/secure-enclave-sgx-attestation.git"
+
+[tool.setuptools]
+packages = ["agents", "enclave_guard"]
+py-modules = ["cli", "enrichment", "simulator", "enclave_guard_app"]
